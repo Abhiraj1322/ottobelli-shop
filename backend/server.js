@@ -4,7 +4,8 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db.js');
 const cookieParser = require('cookie-parser');
 const authRoutes = require("./routes/authRoutes.js");
-
+const categoryRoutes = require("./routes/categoryRoutes.js");
+const productRoutes = require("./routes/productRoutes.js");
 // Load environment variables
 dotenv.config();
 
@@ -24,6 +25,8 @@ app.use(
 app.use(express.json()); // Allows server to accept JSON data in request bodies
 
 app.use("/api/auth", authRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/products", productRoutes);
 // Basic Test Route
 app.get('/', (req, res) => {
   res.send('Ottobelli API is running successfully.');
