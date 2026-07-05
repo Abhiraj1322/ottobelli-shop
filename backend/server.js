@@ -6,6 +6,11 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require("./routes/authRoutes.js");
 const categoryRoutes = require("./routes/categoryRoutes.js");
 const productRoutes = require("./routes/productRoutes.js");
+const customizationRoutes = require("./routes/customizationRoutes");
+const cartRoutes = require("./routes/cartRoutes");
+const profileRoutes = require("./routes/profileRoutes");
+const favoritesRoutes = require("./routes/favoritesRoutes.js");
+
 // Load environment variables
 dotenv.config();
 
@@ -27,6 +32,11 @@ app.use(express.json()); // Allows server to accept JSON data in request bodies
 app.use("/api/auth", authRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/profiles", profileRoutes);
+app.use("/api/favorites", favoritesRoutes);
+app.use("/api/customizations", customizationRoutes);
+app.use("/api/cart", cartRoutes);
+
 // Basic Test Route
 app.get('/', (req, res) => {
   res.send('Ottobelli API is running successfully.');

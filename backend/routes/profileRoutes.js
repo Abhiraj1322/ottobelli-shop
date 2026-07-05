@@ -7,10 +7,10 @@ const {
   updateProfile,
   updateMeasurements,
   deleteProfile,
-} = require("../controllers/profileController");
+} = require("../controllers/profileControllers");
 const { protect } = require("../middleware/authMiddleware");
  
-// All profile routes are protected — must be logged in
+
 router.use(protect);
  
 router.get("/", getProfiles);                              // GET    /api/profiles
