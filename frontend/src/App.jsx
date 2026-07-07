@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { useEffect } from "react";
 import useAuthStore from "./store/authStore";
 
@@ -40,18 +40,30 @@ const App = () => {
   useEffect(() => {
     checkAuth();
   }, []);
+const NavbarLayout = () => {
+  return (
+    <>
+      <Navbar /> {/* Navbar only lives inside this wrapper! */}
+      <Outlet/> {/* This is where the pages will load */}
+    </>
+  );
+};
+
 
   return (
     <BrowserRouter>
-      <Navbar />
+   
       <Routes>
 
         {/* ── Public Routes ── */}
+
         <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route element={<NavbarLayout />}>
         <Route path="/classics" element={<ClassicsPage />} />
         <Route path="/everyday" element={<EverydayPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+      
 
         {/* ── Category + Product Routes ── */}
         <Route path="/classics/:categorySlug" element={<CategoryListingPage section="classics" />} />
@@ -81,7 +93,7 @@ const App = () => {
 
         {/* ── 404 — redirect to home ── */}
         <Route path="*" element={<Navigate to="/" />} />
-
+</Route>
       </Routes>
     </BrowserRouter>
   );
