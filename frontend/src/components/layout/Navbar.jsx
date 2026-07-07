@@ -79,9 +79,9 @@ const Navbar = () => {
     }
   };
 
-  return (
+return (
     <nav
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8"
+      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-8"
       style={{
         height: "46px",
         background: "#09090E",
@@ -89,8 +89,8 @@ const Navbar = () => {
         fontFamily: "'Montserrat', sans-serif",
       }}
     >
-      {/* ── Breadcrumb ── */}
-      <div className="flex items-center gap-1.5 text-[10px] tracking-[0.25em]">
+      {/* ── Breadcrumb — Hidden on mobile to prevent layout collision ── */}
+      <div className="hidden md:flex items-center gap-1.5 text-[10px] tracking-[0.25em]">
         {breadcrumbs.map((crumb, i) => (
           <span key={i} className="flex items-center gap-1.5">
             {i > 0 && <span className="text-white/20">›</span>}
@@ -108,22 +108,24 @@ const Navbar = () => {
         ))}
       </div>
 
+      {/* Spacer for mobile layout alignment to push brand logo perfectly center */}
+      <div className="w-[85px] md:hidden" />
+
       {/* ── Center wordmark ── */}
       <button
         onClick={() => navigate("/")}
-        className="absolute left-1/2 -translate-x-1/2 text-white tracking-[0.45em] font-bold text-sm leading-none"
+        className="absolute left-1/2 -translate-x-1/2 text-white tracking-[0.35em] md:tracking-[0.45em] font-bold text-xs md:text-sm leading-none whitespace-nowrap"
         style={{ fontFamily: "'Montserrat', sans-serif" }}
       >
         OTTOBELLI
       </button>
 
       {/* ── Right icons ── */}
-      <div className="flex items-center gap-5">
-
+      <div className="flex items-center gap-4 md:gap-5 z-10">
         {/* User / Profile */}
         <button
           onClick={handleProfileClick}
-          className="text-white/40 hover:text-white/80 transition-colors duration-200"
+          className="text-white/40 hover:text-white/80 transition-colors duration-200 p-1"
         >
           <User size={15} strokeWidth={1.5} />
         </button>
@@ -131,12 +133,12 @@ const Navbar = () => {
         {/* Favorites */}
         <button
           onClick={handleFavoritesClick}
-          className="relative text-white/40 hover:text-white/80 transition-colors duration-200"
+          className="relative text-white/40 hover:text-white/80 transition-colors duration-200 p-1"
         >
           <Heart size={15} strokeWidth={1.5} />
           {favCount > 0 && (
             <span
-              className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C8A96E] flex items-center justify-center text-[8px] font-bold text-black"
+              className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-[#C8A96E] flex items-center justify-center text-[8px] font-bold text-black"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               {favCount}
@@ -147,19 +149,18 @@ const Navbar = () => {
         {/* Cart */}
         <button
           onClick={() => navigate("/cart")}
-          className="relative text-white/40 hover:text-white/80 transition-colors duration-200"
+          className="relative text-white/40 hover:text-white/80 transition-colors duration-200 p-1"
         >
           <ShoppingBag size={15} strokeWidth={1.5} />
           {cartCount > 0 && (
             <span
-              className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C8A96E] flex items-center justify-center text-[8px] font-bold text-black"
+              className="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-[#C8A96E] flex items-center justify-center text-[8px] font-bold text-black"
               style={{ fontFamily: "'Montserrat', sans-serif" }}
             >
               {cartCount}
             </span>
           )}
         </button>
-
       </div>
     </nav>
   );
