@@ -6,7 +6,8 @@ import api from "../api/axios";
 import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
 import useFavoritesStore from "../store/favoritesStore";
-
+import CustomizationModal from "../components/modals/CustomizationModal";
+import ProfileSelectorModal from "../components/modals/ProfileSelectorModal";
 const ProductPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -27,9 +28,9 @@ const ProductPage = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [imgIndex, setImgIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-  const [showCustomizationModal, setShowCustomizationModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
+const [showCustomizationModal, setShowCustomizationModal] = useState(false);
+const [showProfileModal, setShowProfileModal] = useState(false);
+const [customizationId, setCustomizationId] = useState(null)
   const itemIndex = allProducts.findIndex((p) => p.slug === slug);
   const totalItems = allProducts.length;
   const favorited = product ? isFavorite(product._id) : false;
@@ -82,22 +83,16 @@ const ProductPage = () => {
   };
 
   // Handle add to cart
-  const handleAddToCart = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-    setShowProfileModal(true);
-  };
+const handleAddToCart = () => {
+  if (!isLoggedIn) { navigate("/login"); return; }
+  setShowProfileModal(true);
+};
 
   // Handle customize
-  const handleCustomize = () => {
-    if (!isLoggedIn) {
-      navigate("/login");
-      return;
-    }
-    setShowCustomizationModal(true);
-  };
+const handleCustomize = () => {
+  if (!isLoggedIn) { navigate("/login"); return; }
+  setShowCustomizationModal(true);
+};
 
   // Handle favorite toggle
   const handleFavorite = () => {
@@ -440,6 +435,35 @@ const ProductPage = () => {
           fill={favorited ? "#C8A96E" : "none"}
         />
       </button>
+   
+
+<AnimatePresence>
+  {showCustomizationModal && (
+    <CustomizationModal
+      product={product}
+      profileId={null}
+      onClose={() => setShowCustomizationModal(false)}
+      onSaved={(id) => {
+        setCustomizationId(id);
+        setShowCustomizationModal(false);
+        setShowProfileModal(true);
+      }}
+    />
+  )}
+  {showProfileModal && (
+    <ProfileSelectorModal
+      product={product}
+      customizationSelectionId={customizationId}
+      onClose={() => setShowProfileModal(false)}
+      onAdded={() => {
+        setShowProfileModal(false);
+        navigate("/cart");
+      }}
+    />
+  )}
+</AnimatePresence>
+
+
 
     </div>
   );

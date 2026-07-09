@@ -1,26 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
 const RegisterPage = () => {
   const navigate = useNavigate();
-  const { register, isLoading, error, clearError } = useAuthStore();
+  
+  // 1. Remove global isLoading; handle it locally to prevent checkAuth() conflicts
+  const { register, error, clearError } = useAuthStore();
 
+  const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  // Clear stale errors when visiting or leaving this page
+  useEffect(() => {
+    clearError();
+    return () => clearError();
+  }, [clearError]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
+    setIsLoading(true);
     
-    // Assuming your authStore register function takes name, email, password
-    await register({ name, email, password });
+    // 2. FIXED: Pass credentials as flat arguments matching your Zustand store signature
+    await register(name, email, password);
     
-    const { isLoggedIn } = useAuthStore.getState();
-    if (isLoggedIn) navigate("/");
+    setIsLoading(false);
+    
+    // 3. FIXED: Check updated store state securely using .getState()
+    if (useAuthStore.getState().isLoggedIn) {
+      navigate("/");
+    }
   };
 
   return (
@@ -123,8 +137,9 @@ const RegisterPage = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                disabled={isLoading}
                 placeholder="John Doe"
-                className="w-full px-4 py-3 text-xs outline-none transition-all duration-200"
+                className="w-full px-4 py-3 text-xs outline-none transition-all duration-200 disabled:opacity-50"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -153,8 +168,9 @@ const RegisterPage = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isLoading}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 text-xs outline-none transition-all duration-200"
+                className="w-full px-4 py-3 text-xs outline-none transition-all duration-200 disabled:opacity-50"
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -184,8 +200,9 @@ const RegisterPage = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 text-xs outline-none transition-all duration-200"
+                  className="w-full px-4 py-3 text-xs outline-none transition-all duration-200 disabled:opacity-50"
                   style={{
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid rgba(255,255,255,0.1)",
@@ -210,7 +227,7 @@ const RegisterPage = () => {
               </div>
             </div>
 
-            {/* Terms Notice (Optional but fits luxury theme well) */}
+            {/* Terms Notice */}
             <p className="text-[9px] tracking-wide leading-relaxed text-center" style={{ color: "#9A9080" }}>
               By creating an account, you agree to our terms of service and privacy policy.
             </p>

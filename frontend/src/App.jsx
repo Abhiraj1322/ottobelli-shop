@@ -15,6 +15,7 @@ import AccountPage from "./pages/account/AccountPage";
 import ProfilesPage from "./pages/account/ProfilesPage";
 import MeasurementsPage from "./pages/account/MeasurementsPage";
 import OrderHistoryPage from "./pages/account/OrderHistoryPage";
+import FavoritesPage from "./pages/account/FavoritesPage";
 
 // Layout
 import Navbar from "./components/layout/Navbar";
@@ -90,6 +91,10 @@ const NavbarLayout = () => {
         <Route path="/account/orders" element={
           <ProtectedRoute><OrderHistoryPage /></ProtectedRoute>
         } />
+        
+       <Route path="/account/favorites" element={
+  <ProtectedRoute><FavoritesPage /></ProtectedRoute>
+} />
 
         {/* ── 404 — redirect to home ── */}
         <Route path="*" element={<Navigate to="/" />} />

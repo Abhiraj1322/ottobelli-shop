@@ -1,239 +1,129 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import useAuthStore from "../store/authStore";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError } = useAuthStore();
+  
+  // 1. Destructure actions and error from global store
+  const { login, error, clearError } = useAuthStore();
 
+  // 2. Local loading state to isolate form submissions from checkAuth()
+  const [isLoading, setIsLoading] = useState(false);
+  
+  // 3. Form input states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+
+  // Clear any stale errors when the user visits or leaves this page
+  useEffect(() => {
+    clearError();
+    return () => clearError();
+  }, [clearError]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     clearError();
+    setIsLoading(true);
+
+    // Call the login action from Zustand
     await login(email, password);
-    const { isLoggedIn } = useAuthStore.getState();
-    if (isLoggedIn) navigate("/");
+    
+    setIsLoading(false);
+
+    // Read the updated store state directly to see if login succeeded
+    if (useAuthStore.getState().isLoggedIn) {
+      navigate("/");
+    }
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: "#09090E", fontFamily: "'Montserrat', sans-serif" }}
-    >
-      {/* Background subtle gradient */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% 40%, rgba(200,169,110,0.04) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* Card */}
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }}
-        className="relative w-full mx-4"
-        style={{ maxWidth: "400px" }}
-      >
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <button
-            onClick={() => navigate("/")}
-            className="text-white tracking-[0.45em] font-bold"
-            style={{ fontSize: "20px" }}
-          >
-            OTTOBELLI
-          </button>
-          <p
-            className="text-white/30 tracking-[0.5em] mt-2"
-            style={{ fontSize: "9px" }}
-          >
-            YOUR STYLE. PERFECTED.
+    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
+      <div className="max-w-md w-full space-y-8 p-8 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl">
+        
+        {/* Header */}
+        <div className="text-center">
+          <h2 className="text-3xl font-extrabold text-white tracking-tight">
+            Welcome Back
+          </h2>
+          <p className="mt-2 text-sm text-zinc-400">
+            Sign in to your account to continue
           </p>
-          <div className="flex items-center justify-center gap-3 mt-4">
-            <div className="h-px w-10 bg-white/10" />
-            <div className="w-1 h-1 rounded-full bg-white/10" />
-            <div className="h-px w-10 bg-white/10" />
-          </div>
         </div>
 
-        {/* Form box */}
-        <div
-          style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: "2px",
-            padding: "40px",
-          }}
-        >
-          {/* Title */}
-          <div className="mb-8">
-            <p
-              className="text-[9px] tracking-[0.4em] uppercase mb-2"
-              style={{ color: "#C8A96E", fontWeight: 600 }}
-            >
-              Welcome Back
-            </p>
-            <h1
-              className="text-2xl font-bold text-white"
-              style={{ fontFamily: "'Playfair Display', serif" }}
-            >
-              Sign in to your account
-            </h1>
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm text-center">
+            {error}
           </div>
+        )}
 
-          {/* Error message */}
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-5 px-4 py-3"
-              style={{
-                background: "rgba(255,80,80,0.08)",
-                border: "1px solid rgba(255,80,80,0.2)",
-              }}
-            >
-              <p className="text-[10px] tracking-wider text-red-400">{error}</p>
-            </motion.div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-
-            {/* Email */}
+        {/* Form */}
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="space-y-4">
             <div>
-              <label
-                className="block text-[9px] tracking-[0.3em] uppercase mb-2 font-bold"
-                style={{ color: "#9A9080" }}
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-zinc-300 mb-1">
                 Email Address
               </label>
               <input
+                id="email"
                 type="email"
+                required
+                disabled={isLoading}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="your@email.com"
-                className="w-full px-4 py-3 text-xs outline-none transition-all duration-200"
-                style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#F5F0E8",
-                  letterSpacing: "0.05em",
-                }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "rgba(200,169,110,0.5)")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "rgba(255,255,255,0.1)")
-                }
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition disabled:opacity-50"
+                placeholder="you@example.com"
               />
             </div>
 
-            {/* Password */}
             <div>
-              <label
-                className="block text-[9px] tracking-[0.3em] uppercase mb-2 font-bold"
-                style={{ color: "#9A9080" }}
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-zinc-300 mb-1">
                 Password
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="••••••••"
-                  className="w-full px-4 py-3 text-xs outline-none transition-all duration-200"
-                  style={{
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    color: "#F5F0E8",
-                    letterSpacing: "0.1em",
-                  }}
-                  onFocus={(e) =>
-                    (e.target.style.borderColor = "rgba(200,169,110,0.5)")
-                  }
-                  onBlur={(e) =>
-                    (e.target.style.borderColor = "rgba(255,255,255,0.1)")
-                  }
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] tracking-wider transition-colors"
-                  style={{ color: "#9A9080" }}
-                >
-                  {showPassword ? "HIDE" : "SHOW"}
-                </button>
-              </div>
-            </div>
-
-            {/* Submit button */}
-            <div className="pt-2">
-              <button
-                type="submit"
+              <input
+                id="password"
+                type="password"
+                required
                 disabled={isLoading}
-                className="w-full py-3.5 text-xs font-bold tracking-[0.3em] uppercase transition-all duration-200 hover:opacity-90 disabled:opacity-50"
-                style={{ background: "#C8A96E", color: "#1A1814" }}
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-3 h-3 border border-[#1A1814] border-t-transparent rounded-full animate-spin" />
-                    Signing In...
-                  </span>
-                ) : (
-                  "Sign In"
-                )}
-              </button>
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition disabled:opacity-50"
+                placeholder="••••••••"
+              />
             </div>
-          </form>
-
-          {/* Divider */}
-          <div className="flex items-center gap-4 my-6">
-            <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
-            <span className="text-[9px] tracking-widest" style={{ color: "#9A9080" }}>OR</span>
-            <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.07)" }} />
           </div>
 
-          {/* Register link */}
-          <p className="text-center text-[10px] tracking-wider" style={{ color: "#9A9080" }}>
-            Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="font-bold transition-colors hover:text-white/80"
-              style={{ color: "#C8A96E" }}
+          <div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-sm font-medium text-zinc-950 bg-amber-500 hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-amber-500 transition disabled:opacity-50 font-semibold"
             >
-              Create Account
-            </Link>
-          </p>
-        </div>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  {/* Simple CSS Loading Spinner */}
+                  <svg className="animate-spin h-5 w-5 text-zinc-950" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  Signing In...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </button>
+          </div>
+        </form>
 
-        {/* Footer links */}
-        <div className="flex items-center justify-center gap-6 mt-8">
-          <button
-            className="text-[9px] tracking-wider transition-colors hover:text-white/50 underline underline-offset-2"
-            style={{ color: "#9A9080" }}
-          >
-            Forgot Password?
-          </button>
-          <div className="w-px h-3" style={{ background: "rgba(255,255,255,0.1)" }} />
-          <button
-            onClick={() => navigate("/")}
-            className="text-[9px] tracking-wider transition-colors hover:text-white/50"
-            style={{ color: "#9A9080" }}
-          >
-            Continue as Guest
-          </button>
-        </div>
-      </motion.div>
+        {/* Footer Link */}
+        <p className="text-center text-sm text-zinc-400 mt-4">
+          Don't have an account?{" "}
+          <Link to="/register" className="text-amber-500 hover:text-amber-400 font-medium underline underline-offset-4">
+            Register here
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };
