@@ -6,6 +6,8 @@ import api from "../api/axios";
 import useAuthStore from "../store/authStore";
 import useCartStore from "../store/cartStore";
 import useFavoritesStore from "../store/favoritesStore";
+import CustomizationModal from "../components/modals/CustomizationModal";
+import ProfileSelectorModal from "../components/modals/ProfileSelectorModal";
 
 const ProductPage = () => {
   const { slug } = useParams();
@@ -435,7 +437,31 @@ const handleCustomize = () => {
         />
       </button>
    
-
+<AnimatePresence>
+  {showCustomizationModal && (
+    <CustomizationModal
+      product={product}
+      profileId={null}
+      onClose={() => setShowCustomizationModal(false)}
+      onSaved={(id) => {
+        setCustomizationId(id);
+        setShowCustomizationModal(false);
+        setShowProfileModal(true);
+      }}
+    />
+  )}
+  {showProfileModal && (
+    <ProfileSelectorModal
+      product={product}
+      customizationSelectionId={customizationId}
+      onClose={() => setShowProfileModal(false)}
+      onAdded={() => {
+        setShowProfileModal(false);
+        navigate("/cart");
+      }}
+    />
+  )}
+</AnimatePresence>
 
 
 

@@ -18,6 +18,10 @@ const ProfileSelectorModal = ({
   const [selectedProfileId, setSelectedProfileId] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [showCustomizationModal, setShowCustomizationModal] = useState(false);
+const [showProfileModal, setShowProfileModal] = useState(false);
+const [customizationId, setCustomizationId] = useState(null);
+
 
   // Fetch user profiles
   useEffect(() => {
